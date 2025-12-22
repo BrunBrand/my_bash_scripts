@@ -1,0 +1,20 @@
+#!/usr/bin/env bash 
+
+set -euo pipefail
+
+for input in *.mkv; do 
+  [ -e "$input" ] || continue
+
+  base="${input%.mkv}"
+  output="${base}_jpn.mov"
+
+  ffmpeg -y \
+    -i "$input" \
+    -map 0:v:0 -c:v copy \
+    -map 0:a:1 \
+    -af "aresample=48000:resampler=soxr:precision=28,aformat=sample_fmts=s32:channel_layouts=stereo" \
+    -c:a pcm_s32le \
+    -movflags +faststart \
+    "$output"
+done
+
